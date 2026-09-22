@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "ptx-mlir",
+  "version-string": "0.0.1",
+  "builtin-baseline": "256acc64012b23a13041d8705805e1f23b43a024",
+  "homepage": "https://github.com/endingly/ptx_mlir",
+  "dependencies": [
+    "ptx-frontend",
+    "fmt",
+    "magic-enum",
+    "gtest"
+  ],
+  "features": {
+    "benchmarks": {
+      "description": "Build optional PTX-to-MLIR bridge performance benchmarks",
+      "dependencies": [
+        "benchmark"
+      ]
+    }
+  }
+}

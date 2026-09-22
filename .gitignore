@@ -1,0 +1,10 @@
+.cache
+build
+.vscode
+bin
+out
+__pycache__
+*.egg-info
+.venv
+.codex
+*.whl
