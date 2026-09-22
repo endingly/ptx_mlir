@@ -6,6 +6,7 @@
   "homepage": "https://github.com/endingly/ptx_mlir",
   "dependencies": [
     "ptx-frontend",
+    "mlir",
     "fmt",
     "magic-enum",
     "gtest"

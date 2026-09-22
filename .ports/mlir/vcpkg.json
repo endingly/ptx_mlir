@@ -1,0 +1,16 @@
+{
+  "name": "mlir",
+  "version": "22.1.8",
+  "description": "Prebuilt MLIR and LLVM from the official LLVM release, static build",
+  "homepage": "https://mlir.llvm.org/",
+  "license": "Apache-2.0 WITH LLVM-exception",
+  "supports": "linux & x64",
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    "zlib",
+    "zstd"
+  ]
+}

@@ -1,0 +1,27 @@
+mlir provides CMake targets:
+
+    find_package(MLIR REQUIRED CONFIG)
+    target_link_libraries(main PRIVATE MLIRIR MLIRSupport)
+
+MLIR is a static build: there is no libMLIR.so or libLLVM.so, so the component
+archives in lib/ are linked directly.
+
+The LLVM and MLIR exported targets deliberately carry no
+INTERFACE_INCLUDE_DIRECTORIES, so include paths come from the config variables:
+
+    include_directories(${MLIR_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
+    add_definitions(${LLVM_DEFINITIONS})
+    if(NOT LLVM_ENABLE_RTTI)
+      add_compile_options(-fno-rtti)
+    endif()
+
+MLIRConfig.cmake sits in lib/cmake/mlir rather than share/mlir/cmake, because
+both it and LLVMConfig.cmake derive their install prefix by walking up from their
+own file. The vcpkg toolchain finds it with no extra settings. Set
+MLIR_DIR=<prefix>/lib/cmake/mlir only for a consumer that does not use that
+toolchain.
+
+Tablegen is available: MLIRConfig already points MLIR_TABLEGEN_EXE and
+MLIR_PDLL_TABLEGEN_EXE at this package's bin/, so a dialect project needs no
+PATH setup. Note that FileCheck, not, count and split-file are absent, so a
+lit-based test suite cannot run against this package alone.
