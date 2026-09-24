@@ -12,6 +12,8 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "BUILD_TESTING": "ON",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "MLIR_DIR": "/usr/lib/llvm-21/lib/cmake/mlir",
+                "LLVM_DIR": "/usr/lib/llvm-21/lib/cmake/llvm",
                 "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
             }
         },
@@ -26,6 +28,8 @@
                 "CMAKE_BUILD_TYPE": "Release",
                 "BUILD_TESTING": "ON",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "MLIR_DIR": "/usr/lib/llvm-21/lib/cmake/mlir",
+                "LLVM_DIR": "/usr/lib/llvm-21/lib/cmake/llvm",
                 "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
             }
         }
