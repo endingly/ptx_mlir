@@ -64,7 +64,15 @@ runs:
           -o Binary::apt::APT::Keep-Downloaded-Packages=true \
           install -y --no-install-recommends \
           build-essential ccache clang-format-21 cmake curl flex gcc g++ git \
+          libmlir-21-dev llvm-21-dev mlir-21-tools \
           ninja-build pkg-config python3 python3-pip python3-venv tar unzip zip
+        for package in libmlir-21-dev llvm-21-dev mlir-21-tools; do
+          version="$(dpkg-query -W -f='${Version}' "$package")"
+          [[ "$version" == 1:21.1.8-* ]] || {
+            echo "Expected Ubuntu MLIR/LLVM 21.1.8, got $package=$version" >&2
+            exit 1
+          }
+        done
         sudo chmod -R a+rX "$APT_CACHE_DIR"
 
     - name: Save APT package cache

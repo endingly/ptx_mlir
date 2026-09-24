@@ -10,6 +10,10 @@ endif()
 
 project(ptx_mlir VERSION 0.0.1 LANGUAGES C CXX)
 
+# CI presets select the Ubuntu LLVM/MLIR 21 installation alongside the vcpkg
+# toolchain used for ptx_frontend and the other C++ dependencies.
+find_package(MLIR 21.1.8 EXACT CONFIG REQUIRED)
+
 include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 23)
