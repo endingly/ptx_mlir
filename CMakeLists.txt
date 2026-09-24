@@ -40,20 +40,25 @@ if(BUILD_TESTING)
     include(GoogleTest)
 endif()
 
-# ptx_frontend is supplied by the "ptx-frontend" overlay port in .ports/ and is
-# available to module targets as:
-#
-#     find_package(ptx_frontend CONFIG REQUIRED)
-#     target_link_libraries(<target> PRIVATE ptx_frontend::resolved_ir)
-#
-# No module targets are defined yet. Reusable build components live in cmake/:
-#
-#   register_headers()         module include-root layout for module targets
-#   install_project_targets()  relocatable install/export of the package
-#
-# When the first module lands under submod/<module>/, add
-#
-#     add_subdirectory(submod)
-#
-# next to this comment and call install_project_targets() with the module
-# targets, components, and include destinations.
+add_subdirectory(submod)
+add_subdirectory(tools/ptx-opt)
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
+
+include(install_project_targets)
+install_project_targets(
+    PROJECT ptx_mlir
+    VERSION ${PROJECT_VERSION}
+    NAMESPACE ptx_mlir
+    TARGETS ptx_ir ptx_import
+    COMPONENTS ptx_ir ptx_import
+    INCLUDE_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/submod/ptx_ir/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/submod/ptx_import/include"
+    INCLUDE_DESTINATIONS
+        "${CMAKE_INSTALL_INCLUDEDIR}/ptx_mlir/ptx_ir"
+        "${CMAKE_INSTALL_INCLUDEDIR}/ptx_mlir/ptx_import"
+    DEPENDENCIES "MLIR 21.1.8 EXACT CONFIG"
+)

@@ -6,17 +6,17 @@
 | `integration-smoke.yml` | Push to `main` or `dev`; manual dispatch | Pushes refresh the normal Debug/Release production caches and retain trusted-main seeds |
 | `pr-cache-maintenance.yml` | Completion of `Linux CI`, PR closed | Retains two ccache generations per PR lineage; deletes a closed PR's caches |
 
-Normal Debug/Release coverage remains the regular merge check. No Python or
-installed-package workflow exists yet; the reusable build components under
-`cmake/` are not yet exercised by any tracked target.
+Normal Debug/Release coverage remains the regular merge check. CTest now
+configures, builds, and runs two installed-package consumers: one using only
+`ptx_ir` with frontend discovery disabled, and one linking `ptx_import`.
 
 ## Formatting and naming
 
 CI runs `clang-format-21 --dry-run --Werror` on tracked handwritten C and C++
 sources. Generated and vendor-owned files are excluded: regenerate them through
 their owning pipeline instead of formatting them by hand. New C++ interfaces use
-`snake_case`. The check is vacuous while no C++ source is tracked, so it must not
-be read as evidence that formatting was verified.
+`snake_case`. The check covers the PTX dialect, preflight, tool, and smoke
+consumer sources.
 
 ## Upstream dependency pinning
 
@@ -83,10 +83,8 @@ The Debug/Release presets set `MLIR_DIR` and `LLVM_DIR` to the configs under
 `/usr/lib/llvm-21/lib/cmake/`. The top-level configure calls
 `find_package(MLIR 21.1.8 EXACT CONFIG REQUIRED)`, so a missing or mismatched
 installation fails immediately. MLIR's Ubuntu config uses LLVM's config from
-the same prefix. No module target has been added to the project yet. The Debug
-and Release build/test presets currently verify dependency resolution and the
-empty project graph, not C++ compatibility between the frontend's resolved IR
-and MLIR.
+the same prefix. Debug and Release build/test presets now compile the dialect,
+frontend preflight, and `ptx-opt`, then exercise installed CMake clients.
 
 ## Cache reuse and limitations
 
@@ -113,8 +111,8 @@ own shared namespace. Trusted-main production jobs publish per-run snapshots so
 caches can advance after source changes; this does not bypass ccache content
 validation.
 
-Prewarming covers the default build graph only while no module targets exist, and
-does not promise hits for changed sources or headers, compiler flags, or objects
+Prewarming covers the default build graph and does not promise hits for changed
+sources or headers, compiler flags, or objects
 evicted from the cache. Matching build paths are intentional: ccache normally
 hashes the working directory for Debug compilations. See the
 [ccache path-hashing contract](https://ccache.dev/manual/latest.html#config_hash_dir).

@@ -7,12 +7,17 @@ The goal is to provide a PTX dialect and an importer that preserve the relevant
 instruction and architectural semantics, creating a foundation for analysis,
 transformation, and eventual lowering to other representations.
 
-**Status: experimental.** The repository currently contains dependency
-pinning, Linux CI presets, and reusable CMake helpers. It does not yet define a
-PTX dialect, importer, lowering pipeline, command-line tool, or C++ build
-target. A successful build therefore confirms that the toolchain and declared
-dependencies can be configured; it does not produce a usable PTX-to-MLIR
-converter or establish frontend/MLIR API compatibility.
+**Status: experimental.** The repository builds a registerable, empty PTX
+dialect, a separate frontend preflight library, and `ptx-opt`. The dialect
+currently defines the `ptx` namespace but no operations, types, or attributes.
+The preflight checks a frontend `ResolvedModule` and loads the dialect after
+successful validation; it does not convert resolved IR to MLIR. No lowering
+pipeline or PTX-to-MLIR converter exists yet.
+
+The preflight defaults to the frontend's `RequireCompleteContext` policy. With
+`AvailableContext`, success means only that checks possible from the available
+source context passed. It does not establish full instruction validity or that
+the module can be imported into MLIR.
 
 ## Dependencies
 
@@ -24,7 +29,7 @@ Python 3 with `pip` and `venv`, and vcpkg in manifest mode.
 | --- | --- | --- |
 | MLIR and LLVM 21.1.8 | Ubuntu packages `libmlir-21-dev`, `llvm-21-dev`, `mlir-21-tools` | CMake packages, headers, libraries, and MLIR tools |
 | `ptx_frontend` | Pinned `ptx-frontend` vcpkg overlay port | PTX parsing and resolved semantic IR |
-| `fmt`, `magic-enum`, `gtest` | vcpkg manifest | Planned C++ dependencies and tests |
+| `fmt`, `magic-enum`, `gtest` | vcpkg manifest | Frontend dependencies and test support |
 | `benchmark` | Optional vcpkg `benchmarks` feature | Future benchmarks; no benchmark target exists yet |
 
 APT resolves the runtime dependencies of the three MLIR/LLVM packages. The
@@ -69,10 +74,21 @@ vcpkg and requires the Ubuntu MLIR/LLVM 21.1.8 CMake packages under
 while vcpkg builds the pinned frontend. The build directories are under
 `out/build/`.
 
-There are currently no project build targets or registered tests, so the build
-and CTest steps may report no work or no tests. See
-[CI and dependency notes](.github/CONTRIBUTING.md) for the current CI workflow
-and package details.
+The build produces `ptx_mlir::ptx_ir`, `ptx_mlir::ptx_import`, and the `ptx-opt`
+executable. CTest checks dialect loading, the preflight API, the tool, and two
+installed-package consumers. An installed CMake client can select the IR-only
+component without discovering `ptx_frontend`:
+
+```cmake
+find_package(ptx_mlir CONFIG REQUIRED COMPONENTS ptx_ir)
+target_link_libraries(my_tool PRIVATE ptx_mlir::ptx_ir)
+```
+
+Select `COMPONENTS ptx_import` when using the preflight API; that component
+discovers the pinned `ptx_frontend` package and links both libraries. A package
+request without components also discovers the frontend. See
+[CI and dependency notes](.github/CONTRIBUTING.md) for workflow and package
+details.
 
 ## License
 
